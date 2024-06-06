@@ -13,10 +13,10 @@
 
 static struct devfreq_msm_adreno_tz_data adreno_tz_data = {
 	.bus = {
-		.max = 350,
-		.floating = true,
+		.max = 1600,
+		.floating = false,
 	},
-	.mod_percent = 100,
+	.mod_percent = 110,
 };
 
 /**
@@ -303,7 +303,7 @@ int kgsl_devfreq_target(struct device *dev, unsigned long *freq, u32 flags)
 		 * The GPU is about to get suspended,
 		 * but it needs to be at the max power level when waking up
 		 */
-		pwr->wakeup_maxpwrlevel = 1;
+		pwr->wakeup_maxpwrlevel = 4;
 		return 0;
 	}
 
@@ -719,12 +719,12 @@ static void pwrscale_busmon_create(struct kgsl_device *device,
 static void pwrscale_of_get_ca_target_pwrlevel(struct kgsl_device *device,
 		struct device_node *node)
 {
-	u32 pwrlevel = 1;
+	u32 pwrlevel = 4;
 
 	of_property_read_u32(node, "qcom,ca-target-pwrlevel", &pwrlevel);
 
 	if (pwrlevel >= device->pwrctrl.num_pwrlevels)
-		pwrlevel = 1;
+		pwrlevel = 4;
 
 	device->pwrscale.ctxt_aware_target_pwrlevel = pwrlevel;
 }
@@ -736,7 +736,7 @@ static void pwrscale_of_ca_aware(struct kgsl_device *device)
 	struct device_node *parent = device->pdev->dev.of_node;
 	struct device_node *node, *child;
 
-	pwrscale->ctxt_aware_enable =
+	pwrscale->ctxt_aware_enable = true;
 		of_property_read_bool(parent, "qcom,enable-ca-jump");
 
 	if (!pwrscale->ctxt_aware_enable)
