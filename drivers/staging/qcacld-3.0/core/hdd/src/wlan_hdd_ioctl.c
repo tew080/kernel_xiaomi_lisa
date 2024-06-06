@@ -6843,7 +6843,7 @@ static int hdd_parse_disable_chan_cmd(struct hdd_adapter *adapter, uint8_t *ptr)
 							parsed_channels[j];
 
 		/* Cache the channel list in regulatory also */
-		ucfg_reg_cache_channel_state(hdd_ctx->pdev, parsed_channels,
+		ucfg_reg_cache_channel_freq_state(hdd_ctx->pdev, parsed_channels,
 					     num_channels);
 	} else {
 		for (i = 0; i < num_channels; i++) {
