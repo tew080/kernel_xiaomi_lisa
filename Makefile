@@ -754,24 +754,39 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, address-of-packed-member)
 
-ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
 KBUILD_CFLAGS += -O3
-else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
-KBUILD_CFLAGS += -O3
-else ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
-KBUILD_CFLAGS += -Os
-endif
-
-ifeq ($(cc-name),gcc)
+else  ifeq ($(cc-name),clang)
 KBUILD_CFLAGS	+= -mcpu=cortex-a78.cortex-a55 -mtune=cortex-a78.cortex-a55
-endif
-ifeq ($(cc-name),clang)
 KBUILD_CFLAGS	+= -mcpu=cortex-a55+crypto -mtune=cortex-a55
-KBUILD_CFLAGS += -mcpu=cortex-a78+crc+crypto -mtune=cortex-a78 -march=armv8.4-a+crc+crypto+lse -O3 -funroll-loops
-KBUILD_AFLAGS += -mcpu=cortex-a78+crc+crypto -mtune=cortex-a78 -march=armv8.4-a+crc+crypto+lse -O3 -funroll-loops
+KBUILD_CFLAGS += -mcpu=cortex-a78+crc+crypto -mtune=cortex-a78 -march=armv8.4-a+crc+crypto+dotprod+lse -O3 -funroll-loops
+KBUILD_AFLAGS += -mcpu=cortex-a78+crc+crypto -mtune=cortex-a78 -march=armv8.4-a+crc+crypto+dotprod+lse -O3 -funroll-loops
 #Enable MLGO
 KBUILD_CFLAGS   += -mllvm -regalloc-enable-advisor=release
 KBUILD_LDFLAGS  += -mllvm -regalloc-enable-advisor=release
+#Math related flags
+KBUILD_CFLAGS   += -ffast-math -fno-trapping-math -fno-math-errno
+#Other flags
+KBUILD_CFLAGS   += -fcf-protection=none -funroll-loops --cuda-path=/dev/null
+#-O3 optimization
+KBUILD_LDFLAGS  += -O3 --plugin-opt=O3
+else
+KBUILD_CFLAGS   += -O2
+KBUILD_AFLAGS   += -O2
+KBUILD_LDFLAGS  += -O2
+ifdef CONFIG_INLINE_OPTIMIZATION
+ifdef CONFIG_CC_IS_CLANG
+KBUILD_CFLAGS	+= -mllvm -inline-threshold=2500
+KBUILD_CFLAGS	+= -mllvm -inlinehint-threshold=2000
+KBUILD_CFLAGS	+= -mllvm -unroll-threshold=1200
+else ifdef CONFIG_CC_IS_GCC
+KBUILD_CFLAGS	+= --param max-inline-insns-single=600
+KBUILD_CFLAGS	+= --param max-inline-insns-auto=750
+# We limit inlining to 5KB on the stack.
+KBUILD_CFLAGS	+= --param large-stack-frame=12288
+KBUILD_CFLAGS	+= --param inline-min-speedup=5
+KBUILD_CFLAGS	+= --param inline-unit-growth=60
+endif
 endif
 
 ifdef CONFIG_LLVM_POLLY
