@@ -130,7 +130,7 @@ static int ledtrig_prepare_down_cpu(unsigned int cpu)
 
 static int __init ledtrig_cpu_init(void)
 {
-	unsigned int cpu;
+	int cpu;
 	int ret;
 
 	/* Supports up to 9999 cpu cores */
@@ -148,8 +148,12 @@ static int __init ledtrig_cpu_init(void)
 	 */
 	for_each_possible_cpu(cpu) {
 		struct led_trigger_cpu *trig = &per_cpu(cpu_trig, cpu);
+
+		if (cpu >= 8)
+			continue;
+
 		snprintf(trig->name, MAX_NAME_LEN, "cpu%d", cpu);
-		snprintf(trig->name, MAX_NAME_LEN, "cpu%u", cpu);
+
 		led_trigger_register_simple(trig->name, &trig->_trig);
 	}
 
