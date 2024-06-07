@@ -13,11 +13,12 @@
 
 static struct devfreq_msm_adreno_tz_data adreno_tz_data = {
 	.bus = {
-		.max = 1600,
-		.floating = false,
+		.max = 1200,
+		.floating = true,
 	},
 	.mod_percent = 110,
 };
+
 
 /**
  * struct kgsl_midframe_info - midframe power stats sampling info
