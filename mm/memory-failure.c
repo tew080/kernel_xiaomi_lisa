@@ -1029,7 +1029,6 @@ static bool hwpoison_user_mappings(struct page *p, unsigned long pfn,
 	 */
 	if (kill)
 		collect_procs(hpage, &tokill, flags & MF_ACTION_REQUIRED);
-
 	unmap_success = try_to_unmap(hpage, ttu, NULL);
 	unmap_success = try_to_unmap(hpage, ttu);
 	if (!unmap_success)

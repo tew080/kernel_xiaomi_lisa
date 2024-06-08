@@ -1,6 +1,7 @@
 #!/bin/bash
 SECONDS=0 # builtin bash timer
-TC_DIR="/home/tew404/lisa-Kernel/Clang-19.0.0"
+TC_DIR="/home/tew404/lisa-Kernel/clang-r510928"
+Clang="/home/tew404/lisa-Kernel/Clang-19.0.0"
 DEFCONFIG="lisa_defconfig"
 
 ZIPNAME="Geforce-kernel-lisa-$(date '+%Y%m%d-%H%M').zip"
@@ -12,14 +13,21 @@ fi
 
 MAKE_PARAMS="O=out \
 	ARCH=arm64  \
- 	CC=$TC_DIR/bin/clang  \
+	LD=$Clang/bin/ld.lld \
+ 	CC=$Clang/bin/clang  \
+	AR=$Clang/bin/llvm-ar 
+	AS=$Clang/bin/llvm-as 
+	NM=$Clang/bin/llvm-nm 
+	OBJCOPY=$Clang/bin/llvm-objcopy 
+	OBJDUMP=$Clang/bin/llvm-objdump
+	STRIP=$Clang/bin/llvm-strip
 	CLANG_TRIPLE=aarch64-linux-gnu- \
-	CROSS_COMPILE=$TC_DIR/bin/aarch64-linux-gnu- \
-	CROSS_COMPILE_ARM32=$TC_DIR/bin/arm-linux-gnueabi-  \
+	CROSS_COMPILE=$Clang/bin/aarch64-linux-gnu- \
+	CROSS_COMPILE_ARM32=$Clang/bin/arm-linux-gnueabi-  \
 	LLVM=1 \
 	LLVM_IAS=1"
 
-export PATH="$TC_DIR/bin:$PATH"
+export PATH="$Clang/bin:$PATH"
 
 if [[ $1 = "-r" || $1 = "--regen" ]]; then
 	make $MAKE_PARAMS $DEFCONFIG savedefconfig
